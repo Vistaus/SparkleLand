@@ -37,6 +37,10 @@
             <min>0</min>
             <max>2</max>
         </entry>
+        <entry name="mediaPlaybackIcon" type="String">
+            <!-- Empty keeps the icon hardcoded in the compact representation -->
+            <default></default>
+        </entry>
         <entry name="notificationsEnabled" type="Bool">
             <default>true</default>
         </entry>

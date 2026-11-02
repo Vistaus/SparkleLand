@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
+import org.kde.iconthemes as KIconThemes
 import org.kde.kcmutils as KCM
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.plasmoid
@@ -24,6 +25,12 @@ KCM.SimpleKCM {
 
     property alias cfg_mediaUseThemeBackground: mediaBackgroundCheck.checked
     property alias cfg_mediaCompactStyle: mediaCompactStyleCombo.currentIndex
+    // Empty means the packaged default icon is used
+    // 留空表示使用内置默认图标
+    property string cfg_mediaPlaybackIcon: Plasmoid.configuration.mediaPlaybackIcon
+    // Mirrors the fallback in main.qml so this page previews the same icon
+    // 与 main.qml 的回退值保持一致，使设置页预览同一图标
+    readonly property string defaultMediaPlaybackIcon: "music-note-16th"
 
     property alias cfg_notificationsEnabled: notificationsEnabledCheck.checked
     property alias cfg_notificationsIncludeExpired: notificationsIncludeExpiredCheck.checked
@@ -38,6 +45,17 @@ KCM.SimpleKCM {
     property string cfg_customTimeFormat: Plasmoid.configuration.customTimeFormat
     property alias cfg_showDate: showDateCheck.checked
     property alias cfg_timeFormatMode: timeFormatModeCombo.currentIndex
+
+    // KDE icon chooser shared by the media icon controls
+    // 媒体图标控件共用的 KDE 图标选择器
+    KIconThemes.IconDialog {
+        id: mediaPlaybackIconDialog
+
+        title: i18n("Select Playback Icon")
+        // The chooser only emits the name after the user confirms
+        // 用户在对话框中确认后才会收到图标名
+        onIconNameChanged: iconName => page.cfg_mediaPlaybackIcon = iconName
+    }
 
     Kirigami.FormLayout {
         QQC2.Label {
@@ -127,6 +145,32 @@ KCM.SimpleKCM {
             Kirigami.FormData.label: i18n("Background:")
             checked: Plasmoid.configuration.mediaUseThemeBackground
             text: i18n("Use the theme highlight color as background while playing")
+        }
+
+        // Only the clock+icon style renders the playback icon
+        // 仅时钟+图标样式会显示播放图标
+        RowLayout {
+            Kirigami.FormData.label: i18n("Playback icon:")
+
+            QQC2.Button {
+                id: mediaPlaybackIconButton
+
+                enabled: mediaCompactStyleCombo.currentIndex === 2
+                icon.name: page.cfg_mediaPlaybackIcon.length > 0 ? page.cfg_mediaPlaybackIcon : page.defaultMediaPlaybackIcon
+                text: page.cfg_mediaPlaybackIcon.length > 0 ? page.cfg_mediaPlaybackIcon : i18n("Packaged default")
+                onClicked: mediaPlaybackIconDialog.open()
+            }
+
+            QQC2.Button {
+                display: QQC2.AbstractButton.IconOnly
+                enabled: mediaPlaybackIconButton.enabled && page.cfg_mediaPlaybackIcon.length > 0
+                icon.name: "edit-undo"
+                text: i18n("Restore the packaged default icon")
+                onClicked: page.cfg_mediaPlaybackIcon = ""
+
+                QQC2.ToolTip.text: text
+                QQC2.ToolTip.visible: hovered
+            }
         }
 
         QQC2.Label {

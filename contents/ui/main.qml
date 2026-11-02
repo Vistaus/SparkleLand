@@ -37,6 +37,12 @@ PlasmoidItem {
 		const style = root.configNumber(plasmoid.configuration.mediaCompactStyle, 0);
 		return (style >= 0 && style <= 2) ? Math.round(style) : 0;
 	}
+	// Icon shown in the compact clock style; an empty value keeps the packaged default
+	// 时钟+图标样式使用的图标；为空时回退到内置默认图标
+	readonly property string mediaPlaybackIcon: {
+		const icon = root.configString(plasmoid.configuration.mediaPlaybackIcon);
+		return icon.length > 0 ? icon : "music-note-16th";
+	}
 	// Notifications default to enabled; disabling them restores the original layout
 	// 通知默认开启，关闭后恢复原布局
 	readonly property bool notificationsEnabled: plasmoid.configuration.notificationsEnabled !== false
@@ -446,7 +452,7 @@ PlasmoidItem {
 			anchors.verticalCenter: parent.verticalCenter
 			color: root.mediaBackgroundVisible ? root.theme.textColor : root.theme.accentColor
 			height: iconSize
-			source: "music-note-16th"
+			source: root.mediaPlaybackIcon
 			visible: root.compactShowsMediaIcon
 			width: iconSize
 		}

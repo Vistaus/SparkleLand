@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plasma_applet_com.astrasparkle.sparkleland\n"
 "Report-Msgid-Bugs-To: https://github.com/astra-sparkle/SparkleLand/issues\n"
-"POT-Creation-Date: 2026-10-22 20:48+0800\n"
+"POT-Creation-Date: 2026-11-02 15:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,171 +22,187 @@ msgctxt "@title:group for configuration dialog page"
 msgid "General"
 msgstr ""
 
-#: contents/config/option.qml:45
-msgid "Panel"
-msgstr ""
-
 #: contents/config/option.qml:51
-msgid "Minimum width:"
+msgid "Select Playback Icon"
 msgstr ""
 
 #: contents/config/option.qml:60
+msgid "Panel"
+msgstr ""
+
+#: contents/config/option.qml:66
+msgid "Minimum width:"
+msgstr ""
+
+#: contents/config/option.qml:75
 msgid "Maximum width:"
 msgstr ""
 
-#: contents/config/option.qml:68
+#: contents/config/option.qml:83
 msgid "Font"
 msgstr ""
 
-#: contents/config/option.qml:75 contents/config/option.qml:87
-#: contents/config/option.qml:232 contents/config/option.qml:252
+#: contents/config/option.qml:90 contents/config/option.qml:102
+#: contents/config/option.qml:273 contents/config/option.qml:293
 msgid "Follow system"
 msgstr ""
 
-#: contents/config/option.qml:84
+#: contents/config/option.qml:99
 msgid "Size:"
 msgstr ""
 
-#: contents/config/option.qml:87
+#: contents/config/option.qml:102
 msgid "%1 pt"
 msgstr ""
 
-#: contents/config/option.qml:97
+#: contents/config/option.qml:112
 msgid "Bold"
 msgstr ""
 
-#: contents/config/option.qml:104
+#: contents/config/option.qml:119
 msgid "Italic"
 msgstr ""
 
-#: contents/config/option.qml:109
+#: contents/config/option.qml:124
 msgid "Media"
 msgstr ""
 
-#: contents/config/option.qml:115
+#: contents/config/option.qml:130
 msgid "While playing:"
 msgstr ""
 
-#: contents/config/option.qml:118
+#: contents/config/option.qml:133
 msgid "Show the track title instead of the panel text"
 msgstr ""
 
-#: contents/config/option.qml:119
+#: contents/config/option.qml:134
 msgid "Keep the clock and use the background color"
 msgstr ""
 
-#: contents/config/option.qml:120
+#: contents/config/option.qml:135
 msgid "Keep the clock and show a playback icon"
 msgstr ""
 
-#: contents/config/option.qml:127
+#: contents/config/option.qml:142
 msgid "Background:"
 msgstr ""
 
-#: contents/config/option.qml:129
+#: contents/config/option.qml:144
 msgid "Use the theme highlight color as background while playing"
 msgstr ""
 
-#: contents/config/option.qml:134 contents/ui/Notifications.qml:111
+#: contents/config/option.qml:150
+msgid "Playback icon:"
+msgstr ""
+
+#: contents/config/option.qml:157
+msgid "Packaged default"
+msgstr ""
+
+#: contents/config/option.qml:165
+msgid "Restore the packaged default icon"
+msgstr ""
+
+#: contents/config/option.qml:175 contents/ui/Notifications.qml:114
 #: contents/ui/NotificationsPopup.qml:192
 msgid "Notifications"
 msgstr ""
 
-#: contents/config/option.qml:140
+#: contents/config/option.qml:181
 msgid "Notifications:"
 msgstr ""
 
-#: contents/config/option.qml:142
+#: contents/config/option.qml:183
 msgid "Replace the clock or calendar area with the notification list"
 msgstr ""
 
-#: contents/config/option.qml:148
+#: contents/config/option.qml:189
 msgid "Banners:"
 msgstr ""
 
-#: contents/config/option.qml:151
+#: contents/config/option.qml:192
 msgid "Show notifications as banners next to this widget"
 msgstr ""
 
-#: contents/config/option.qml:157
+#: contents/config/option.qml:198
 msgid "Banner duration:"
 msgstr ""
 
-#: contents/config/option.qml:161
+#: contents/config/option.qml:202
 msgid "%1 second"
 msgid_plural "%1 seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contents/config/option.qml:172
+#: contents/config/option.qml:213
 msgid ""
 "Remove the Plasma Notifications widget from the panel, otherwise every "
 "notification is shown twice."
 msgstr ""
 
-#: contents/config/option.qml:180
+#: contents/config/option.qml:221
 msgid "Maximum shown:"
 msgstr ""
 
-#: contents/config/option.qml:184
+#: contents/config/option.qml:225
 msgid "No limit"
 msgstr ""
 
-#: contents/config/option.qml:184
+#: contents/config/option.qml:225
 msgid "%1 notification"
 msgid_plural "%1 notifications"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contents/config/option.qml:195
+#: contents/config/option.qml:236
 msgid "Keep notifications that timed out or were dismissed"
 msgstr ""
 
-#: contents/config/option.qml:203
+#: contents/config/option.qml:244
 msgid "Show the do not disturb button"
 msgstr ""
 
-#: contents/config/option.qml:211
+#: contents/config/option.qml:252
 msgid "Show the clear all button"
 msgstr ""
 
-#: contents/config/option.qml:219
+#: contents/config/option.qml:260
 msgid "Show the unread count in the notification dot"
 msgstr ""
 
-#: contents/config/option.qml:224
+#: contents/config/option.qml:265
 msgid "Time and date"
 msgstr ""
 
-#: contents/config/option.qml:230
+#: contents/config/option.qml:271
 msgid "Clock:"
 msgstr ""
 
-#: contents/config/option.qml:232
+#: contents/config/option.qml:273
 msgid "12-hour"
 msgstr ""
 
-#: contents/config/option.qml:232
+#: contents/config/option.qml:273
 msgid "24-hour"
 msgstr ""
 
-#: contents/config/option.qml:236
+#: contents/config/option.qml:277
 msgid "Custom time format:"
 msgstr ""
 
-#: contents/config/option.qml:237
+#: contents/config/option.qml:278
 msgid "Use the setting above"
 msgstr ""
 
-#: contents/config/option.qml:245
+#: contents/config/option.qml:286
 msgid "Date:"
 msgstr ""
 
-#: contents/config/option.qml:247
+#: contents/config/option.qml:288
 msgid "Show the date under the time"
 msgstr ""
 
-#: contents/config/option.qml:251
+#: contents/config/option.qml:292
 msgid "Date format:"
 msgstr ""
 
@@ -195,41 +211,41 @@ msgctxt "Format: month year"
 msgid "%1 %2"
 msgstr ""
 
-#: contents/ui/Calender.qml:295
+#: contents/ui/Calender.qml:283
 msgid "Today"
 msgstr ""
 
-#: contents/ui/Notifications.qml:60
+#: contents/ui/Notifications.qml:63
 msgid "Just now"
 msgstr ""
 
-#: contents/ui/Notifications.qml:65
+#: contents/ui/Notifications.qml:68
 msgid "%1 min ago"
 msgid_plural "%1 min ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contents/ui/Notifications.qml:70
+#: contents/ui/Notifications.qml:73
 msgid "%1 hour ago"
 msgid_plural "%1 hours ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contents/ui/Notifications.qml:73
+#: contents/ui/Notifications.qml:76
 msgid "%1 day ago"
 msgid_plural "%1 days ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contents/ui/Notifications.qml:188
+#: contents/ui/Notifications.qml:191
 msgid "Do not disturb is active"
 msgstr ""
 
-#: contents/ui/Notifications.qml:367
+#: contents/ui/Notifications.qml:370
 msgid "No unread notifications"
 msgstr ""
 
-#: contents/ui/Notifications.qml:367
+#: contents/ui/Notifications.qml:370
 msgid "Notification service is not available"
 msgstr ""
 
