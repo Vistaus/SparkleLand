@@ -61,6 +61,48 @@ PlasmoidItem {
 	// 面板所在屏幕边缘，供横幅定位（Plasma::Types::Location）
 	readonly property int panelLocation: plasmoid.location
 	readonly property bool showDate: plasmoid.configuration.showDate === true
+	// Tooltip clock ticks every second
+	// 提示中的时钟每秒刷新
+	property date hoverTooltipNow: new Date()
+	// Follow the configured 12/24-hour mode but always include seconds
+	// 跟随已配置的 12/24 小时制，并始终包含秒
+	readonly property string hoverTooltipTimeFormat: {
+		const mode = root.configNumber(plasmoid.configuration.timeFormatMode, 0);
+		if (mode === 1) {
+			return "h:mm:ss AP";
+		}
+		if (mode === 2) {
+			return "HH:mm:ss";
+		}
+		return Qt.locale().timeFormat(Locale.ShortFormat).indexOf("AP") >= 0 ? "h:mm:ss AP" : "HH:mm:ss";
+	}
+	// Unread summary plus the current track when media is playing
+	// 未读通知概要，播放媒体时追加当前曲目
+	readonly property string hoverTooltipSubText: {
+		const parts = [];
+		if (root.notificationsEnabled) {
+			const unread = root.unreadNotificationCount;
+			parts.push(unread > 0
+				? i18np("%1 unread notification", "%1 unread notifications", unread)
+				: i18n("No unread notifications"));
+		}
+		if (root.isPlaying && root.trackTitle.length > 0) {
+			parts.push(i18n("Now playing: %1", root.trackTitle));
+		}
+		return parts.join(" · ");
+	}
+	// Time is the title and the status line replaces the packaged description
+	// 标题为时间，状态行替换内置描述
+	toolTipMainText: Qt.formatTime(root.hoverTooltipNow, root.hoverTooltipTimeFormat)
+	toolTipSubText: root.hoverTooltipSubText
+
+	Timer {
+		interval: 1000
+		repeat: true
+		running: true
+		triggeredOnStart: true
+		onTriggered: root.hoverTooltipNow = new Date()
+	}
 	// Scale compact text with panel height when no font size is configured
 	// 未配置字号时，紧凑文本随面板高度缩放
 	readonly property bool autoCompactFontSize: root.configNumber(plasmoid.configuration.fontPointSize, 0) <= 0
