@@ -1,8 +1,6 @@
 import QtQuick
 import org.kde.kirigami as Kirigami
 
-
-
 // Compact media title; controls are rendered in the expanded panel
 // 紧凑条目中的曲目名，播放控制位于展开面板
 Item {
@@ -36,10 +34,6 @@ Item {
         verticalAlignment: Text.AlignVCenter
         wrapMode: Text.NoWrap
     }
-
-
-
-
 
     // Playback buttons with a lightweight hover highlight
     // 带轻量悬停高亮的播放控制按钮

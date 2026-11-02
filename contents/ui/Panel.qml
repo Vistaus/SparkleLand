@@ -3,8 +3,6 @@ import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 import org.kde.kirigami as Kirigami
 
-
-
 // Expanded panel with a calendar on the left and context-dependent content on the right
 // 展开面板左侧显示日历，右侧内容根据当前状态变化
 Item {
@@ -49,8 +47,6 @@ Item {
     // Height reserved for the page indicator and its hit area
     // 为页码指示器及其点击区域预留的高度
     readonly property int indicatorHeight: Math.round(root.height * 0.08)
-
-
 
     Item {
         id: leftPane
@@ -224,8 +220,6 @@ Item {
         }
     }
 
-
-
     Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
@@ -233,9 +227,6 @@ Item {
         height: Math.round(root.height * 0.95)
         width: 1
     }
-
-
-
 
     Item {
         id: rightPane

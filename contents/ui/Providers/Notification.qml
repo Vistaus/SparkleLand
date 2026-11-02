@@ -1,15 +1,14 @@
 import QtQuick
 import org.kde.notificationmanager as NotificationManager
 
-
-
-// Data provider for the Plasma notification model and actions
-// Plasma 通知模型与操作的数据提供器
+// Notification data source, the only user of the Plasma notification module
+// 通知数据源，Plasma 通知模块的唯一使用处
 QtObject {
     id: root
 
-    // Properties injected by main.qml
-    // 由 main.qml 注入的属性
+    // Configuration injected by Providers
+    // 由 Providers 注入的配置
+    property bool enabled: true
     property int maxVisible: 5
     property bool includeExpired: true
 
@@ -69,16 +68,13 @@ QtObject {
     // Timestamp of the last time the user looked at the list, defines what counts as unread
     // 上次查看列表的时间戳，用于界定未读范围
     property double lastReadMs: 0
-    // Delay banners until the provider is fully initialized
+    // Delay banners until the data source is fully initialized
     // 数据源完成初始化后再显示横幅
     property bool bannerReady: false
     // Keep critical alerts eligible during do-not-disturb when configured
     // 按设置在勿扰期间保留紧急横幅
     property int bannerUrgencies: 0
     property int criticalUrgency: -1
-
-
-
     // Refresh counters when the list content changes
     // 列表内容变化时刷新计数
     readonly property Connections listWatcher: Connections {
@@ -112,20 +108,21 @@ QtObject {
             }
 
             for (let row = first; row <= last; ++row) {
-                const banner = root.bannerFor(row);
-                if (banner !== null && root.isRecent(banner.created)) {
+                const banner = root.bannerDataForRow(row);
+                if (banner !== null && root.isRecentNotification(banner.created)) {
                     root.bannerRequested(banner.id);
                 }
             }
         }
     }
 
+    // Hide notification data while the feature is switched off
+    // 功能关闭时隐藏通知数据
+    onEnabledChanged: root.refreshCounts()
 
-
-
-    // Initialize once after configuration is ready
-    // 配置就绪后执行一次初始化
-    function activate() {
+    // Initialize once after the data source is created
+    // 数据源创建后执行一次初始化
+    function initialize() {
         root.criticalUrgency = NotificationManager.Notifications.CriticalUrgency;
         // Treat restored history as read so a restart does not raise the badge
         // 将重启后恢复的历史视为已读，避免重启后出现角标
@@ -135,18 +132,16 @@ QtObject {
         root.bannerReady = true;
     }
 
-
-
-
     function refreshCounts() {
-        root.count = root.available ? root.listModel.count : 0;
-        root.unreadCount = root.available ? root.countUnread() : 0;
+        const active = root.enabled && root.available;
+        root.count = active ? root.listModel.count : 0;
+        root.unreadCount = active ? root.countUnreadNotifications() : 0;
     }
 
     // Count notifications that arrived after the last read marker; the model's own
     // unreadNotificationsCount stays at zero on this Plasma build
     // 统计上次已读标记之后到达的通知；此版本 Plasma 自带的未读计数恒为 0
-    function countUnread() {
+    function countUnreadNotifications() {
         const model = root.listModel;
         const notificationType = NotificationManager.Notifications;
         let unread = 0;
@@ -203,13 +198,14 @@ QtObject {
 
     // Show banners only for recent notifications
     // 仅为近期通知显示横幅
-    function isRecent(created) {
-        return (created instanceof Date) && !isNaN(created.getTime()) && (Date.now() - created.getTime() < 15000);
+    function isRecentNotification(createdAt) {
+        return (createdAt instanceof Date) && !isNaN(createdAt.getTime())
+            && (Date.now() - createdAt.getTime() < 15000);
     }
 
     // Return banner data for a row, or null if invalid
     // 返回指定行的横幅数据，无效时返回 null
-    function bannerFor(row) {
+    function bannerDataForRow(row) {
         const model = root.popupModel;
         if (row < 0 || row >= model.count) {
             return null;
@@ -230,10 +226,10 @@ QtObject {
 
     // Find banner data by notification ID
     // 按通知 ID 查找横幅数据
-    function bannerForId(notificationId) {
+    function bannerDataForId(notificationId) {
         const model = root.popupModel;
         for (let row = 0; row < model.count; ++row) {
-            const banner = root.bannerFor(row);
+            const banner = root.bannerDataForRow(row);
             if (banner !== null && banner.id === notificationId) {
                 return banner;
             }
@@ -244,7 +240,7 @@ QtObject {
 
     // Find a notification row by ID
     // 按通知 ID 查找列表行
-    function rowForId(notificationId) {
+    function rowForNotificationId(notificationId) {
         const model = root.listModel;
         const notificationType = NotificationManager.Notifications;
         for (let row = 0; row < model.count; ++row) {
@@ -258,8 +254,8 @@ QtObject {
 
     // Close a notification by ID
     // 按 ID 关闭通知
-    function closeById(notificationId) {
-        const row = root.rowForId(notificationId);
+    function closeNotificationById(notificationId) {
+        const row = root.rowForNotificationId(notificationId);
         if (row >= 0) {
             root.close(row);
         }
@@ -267,8 +263,8 @@ QtObject {
 
     // Trigger a notification's default action by ID
     // 按 ID 触发通知的默认操作
-    function triggerById(notificationId) {
-        const row = root.rowForId(notificationId);
+    function triggerNotificationById(notificationId) {
+        const row = root.rowForNotificationId(notificationId);
         return row >= 0 ? root.trigger(row) : false;
     }
 
@@ -307,9 +303,6 @@ QtObject {
         root.refreshCounts();
     }
 
-
-
-
     // Toggle do-not-disturb using Plasma's notification settings
     // 使用 Plasma 通知设置切换勿扰状态
     function toggleInhibition() {
@@ -328,17 +321,11 @@ QtObject {
         root.refreshInhibition();
     }
 
-
-
-
     // List operations use model row indexes
     // 列表操作使用模型行号
     function close(row) {
         root.listModel.close(root.listModel.index(row, 0));
     }
-
-
-
 
     // Trigger the default action and return false when unavailable
     // 触发默认操作；不可用时返回 false

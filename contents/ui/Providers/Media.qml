@@ -1,14 +1,12 @@
 import QtQuick
 import org.kde.plasma.private.mpris as Mpris
 
-
-
-// MPRIS data provider for track title, artwork, and playback actions
-// 提供曲目名称、专辑封面和播放控制的 MPRIS 数据源
+// MPRIS data source, the only user of the private MPRIS module
+// MPRIS 数据源，私有 MPRIS 模块的唯一使用处
 QtObject {
     id: root
 
-    readonly property var mpris2Model: Mpris.Mpris2Model {
+    readonly property Mpris.Mpris2Model mpris2Model: Mpris.Mpris2Model {
     }
     readonly property var currentPlayer: root.mpris2Model.currentPlayer
 

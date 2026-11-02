@@ -3,8 +3,6 @@ import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 import org.kde.ksvg as KSvg
 
-
-
 // Notification list with do-not-disturb and clear actions
 // 通知列表，包含勿扰和清除操作
 Item {
@@ -94,8 +92,6 @@ Item {
     Component.onCompleted: if (root.effectiveActive) {
         root.refresh();
     }
-
-
 
     ColumnLayout {
         anchors.fill: parent
@@ -374,8 +370,6 @@ Item {
             }
         }
     }
-
-
 
     // Refresh relative times and do-not-disturb state, including timed expiry
     // 刷新相对时间和勿扰状态，并处理定时抑制到期

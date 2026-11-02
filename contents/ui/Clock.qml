@@ -1,7 +1,5 @@
 import QtQuick
 
-
-
 // Display time and an optional date, styled by the caller
 // 显示时间和可选日期，样式由调用方提供
 Item {
@@ -47,8 +45,6 @@ Item {
     implicitHeight: contentColumn.implicitHeight
     implicitWidth: Math.max(timeLabel.implicitWidth, root.showDate ? dateLabel.implicitWidth : 0) + 24
 
-
-
     Column {
         id: contentColumn
 
@@ -85,8 +81,6 @@ Item {
             width: parent.width
         }
     }
-
-
 
     // Run only while visible and align updates to a time boundary
     // 仅在时钟可见时运行，并对齐到下一个时间边界

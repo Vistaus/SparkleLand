@@ -7,7 +7,6 @@ import org.kde.kirigami as Kirigami
 import org.kde.plasma.plasmoid
 
 
-
 // Bind cfg_ entries on the configuration page to KConfig values
 // 将配置页中的 cfg_ 条目绑定到 KConfig 值
 KCM.SimpleKCM {

@@ -23,10 +23,6 @@ PlasmoidItem {
 		return typeof value === "string" ? value : "";
 	}
 
-	function safeMax(first, second) {
-		return Math.max(root.configNumber(first, 0), root.configNumber(second, 0));
-	}
-
 	readonly property int panelMinimumWidth: Math.max(16, root.configNumber(plasmoid.configuration.minimumPanelWidth, 64))
 	readonly property int panelMaximumWidth: Math.max(root.panelMinimumWidth, root.configNumber(plasmoid.configuration.maximumPanelWidth, 240))
 	readonly property int panelAverageWidth: Math.round((root.panelMinimumWidth + root.panelMaximumWidth) / 2)
@@ -96,18 +92,9 @@ PlasmoidItem {
 	toolTipMainText: Qt.formatTime(root.hoverTooltipNow, root.hoverTooltipTimeFormat)
 	toolTipSubText: root.hoverTooltipSubText
 
-	Timer {
-		interval: 1000
-		repeat: true
-		running: true
-		triggeredOnStart: true
-		onTriggered: root.hoverTooltipNow = new Date()
-	}
 	// Scale compact text with panel height when no font size is configured
 	// 未配置字号时，紧凑文本随面板高度缩放
 	readonly property bool autoCompactFontSize: root.configNumber(plasmoid.configuration.fontPointSize, 0) <= 0
-
-
 
 	// Measure the Kirigami theme font in the same logical pixels used by the panel
 	// 使用 TextMetrics 将 Kirigami 主题字体测量为面板使用的逻辑像素
@@ -177,15 +164,13 @@ PlasmoidItem {
 		return custom.length > 0 ? custom : Qt.locale().dateFormat(Locale.ShortFormat);
 	}
 
-
-
 	// Share theme colors, fonts, and spacing with child components; derive accent variants here
 	// 向子组件提供主题颜色、字体和间距，并在此计算强调色变体
 	QtObject {
 		id: themeAdapter
 
-		// Font colors are bound to QPalette roles so the active color scheme stays authoritative
-		// 字体颜色全部绑定到 QPalette 角色，由当前配色方案决定
+		// Font colors follow the active palette
+		// 字体颜色遵循当前调色板
 		readonly property color textColor: root.palette.active.windowText
 		readonly property color disabledTextColor: root.palette.disabled.windowText
 		// QPalette has no semantic error role; use Breeze negative red
@@ -236,8 +221,6 @@ PlasmoidItem {
 
 	readonly property var theme: themeAdapter
 
-
-
 	readonly property font panelFont: {
 		const family = root.configString(plasmoid.configuration.fontFamily);
 		const pointSize = root.configNumber(plasmoid.configuration.fontPointSize, 0);
@@ -249,21 +232,21 @@ PlasmoidItem {
 		});
 	}
 
-	// Clock and calendar remain available without MPRIS; mediaState: 0 = unchecked, 1 = available, -1 = unavailable
-	// MPRIS 不可用时仍可使用时钟和日历；mediaState：0 = 未检测，1 = 可用，-1 = 不可用
-	property int mediaState: 0
-	property var mediaProvider: null
+	// Each external feature has an isolated provider
+	// 每个外部功能都使用独立的数据源
+	Providers {
+		id: providers
 
-	readonly property string trackTitle: root.mediaProvider !== null ? root.mediaProvider.trackTitle : ""
-	readonly property bool isPlaying: root.mediaProvider !== null && root.mediaProvider.playing
+		notificationsEnabled: root.notificationsEnabled
+		notificationsIncludeExpired: root.notificationsIncludeExpired
+		notificationsMaxVisible: root.notificationsMaxVisible
+	}
 
-	// Notification failures do not affect other features; notificationsState: 0 = unchecked, 1 = available, -1 = unavailable
-	// 通知服务故障不影响其他功能；notificationsState：0 = 未检测，1 = 可用，-1 = 不可用
-	property int notificationsState: 0
-	property var notificationsProvider: null
+	readonly property string trackTitle: providers.media.trackTitle
+	readonly property bool isPlaying: providers.media.playing
 
-	readonly property bool hasNotifications: root.notificationsEnabled && root.notificationsProvider !== null && root.notificationsProvider.count > 0
-	readonly property int unreadNotificationCount: root.notificationsEnabled && root.notificationsProvider !== null ? root.notificationsProvider.unreadCount : 0
+	readonly property bool hasNotifications: providers.notifications.hasNotifications
+	readonly property int unreadNotificationCount: providers.notifications.unreadCount
 
 	// Use the accent as the media background and shift it when paused
 	// 媒体背景使用强调色，暂停时按主题明暗调整以作区分
@@ -289,108 +272,12 @@ PlasmoidItem {
 	Plasmoid.title: root.appTitle
 	Plasmoid.icon: root.isPlaying ? "media-playback-start" : root.appIconName
 
-
-
-	Component.onCompleted: {
-		root.resolveMediaProvider();
-		root.resolveNotificationsProvider();
-	}
-
-
-
-
-	// Load the media provider at runtime so failures leave other features available
-	// 运行时加载媒体数据源，失败时保留其他功能
-	function resolveMediaProvider() {
-		if (root.mediaState !== 0) {
-			return;
-		}
-
-		const component = Qt.createComponent("MprisProvider.qml");
-		if (component.status === Component.Loading) {
-			component.statusChanged.connect(function() {
-				root.useMediaComponent(component);
-			});
-			return;
-		}
-		root.useMediaComponent(component);
-	}
-
-	function useMediaComponent(component) {
-		if (component.status === Component.Error) {
-			root.mediaState = -1;
-			console.info("Sparkle Land: MPRIS 不可用，面板只显示时钟：", component.errorString());
-			return;
-		}
-		if (component.status !== Component.Ready) {
-			return;
-		}
-
-		const provider = component.createObject(root);
-		if (!provider) {
-			root.mediaState = -1;
-			console.warn("Sparkle Land: MPRIS 组件实例化失败：", component.errorString());
-			return;
-		}
-
-		root.mediaProvider = provider;
-		root.mediaState = 1;
-		console.info("Sparkle Land: 私有 MPRIS 实现已生效");
-	}
-
-	// Load notifications at runtime so failures leave the clock and calendar available
-	// 运行时加载通知数据源，失败时保留时钟与日历
-	function resolveNotificationsProvider() {
-		if (root.notificationsState !== 0 || !root.notificationsEnabled) {
-			return;
-		}
-
-		const component = Qt.createComponent("NotificationsProvider.qml");
-		if (component.status === Component.Loading) {
-			component.statusChanged.connect(function() {
-				root.useNotificationsComponent(component);
-			});
-			return;
-		}
-		root.useNotificationsComponent(component);
-	}
-
-	function useNotificationsComponent(component) {
-		if (component.status === Component.Error) {
-			root.notificationsState = -1;
-			console.info("Sparkle Land: 通知服务不可用：", component.errorString());
-			return;
-		}
-		if (component.status !== Component.Ready) {
-			return;
-		}
-
-		const provider = component.createObject(root, {
-			"includeExpired": root.notificationsIncludeExpired,
-			"maxVisible": root.notificationsMaxVisible
-		});
-		if (!provider) {
-			root.notificationsState = -1;
-			console.warn("Sparkle Land: 通知组件实例化失败：", component.errorString());
-			return;
-		}
-
-		// Propagate config changes without reloading the applet
-		// 配置变化时同步给数据源，无需重载小组件
-		provider.includeExpired = Qt.binding(function() {
-			return root.notificationsIncludeExpired;
-		});
-		provider.maxVisible = Qt.binding(function() {
-			return root.notificationsMaxVisible;
-		});
-
-		// Initialize models here, not in bindings, to avoid loops from synchronous lazy-init signals
-		// 在此初始化模型而非绑定中触碰，避免惰性初始化信号造成绑定循环
-		provider.activate();
-
-		root.notificationsProvider = provider;
-		root.notificationsState = 1;
-		console.info("Sparkle Land: 私有通知实现已生效");
+	Timer {
+		interval: 1000
+		repeat: true
+		running: true
+		triggeredOnStart: true
+		onTriggered: root.hoverTooltipNow = new Date()
 	}
 
 	// Expand the calendar and select the requested date, or today by default
@@ -401,9 +288,6 @@ PlasmoidItem {
 		root.expanded = true;
 	}
 
-
-
-
 	function toggleCalendar(date) {
 		if (root.expanded) {
 			root.expanded = false;
@@ -412,14 +296,11 @@ PlasmoidItem {
 		openCalendar(date);
 	}
 
-
-
-
 	compactRepresentation: Item {
 		id: compactItem
 
 		readonly property int contentWidth: root.compactShowsMediaTitle
-			? root.safeMax(clockItem.implicitWidth, mediaItem.implicitWidth)
+			? Math.max(clockItem.implicitWidth, mediaItem.implicitWidth)
 			: clockItem.implicitWidth + compactItem.sideSpace
 
 		readonly property font primaryFont: root.autoCompactFontSize
@@ -462,7 +343,7 @@ PlasmoidItem {
 		Rectangle {
 			anchors.fill: parent
 			color: root.mediaBackgroundColor
-			radius: 4
+			radius: Kirigami.Units.cornerRadius
 			visible: root.mediaBackgroundVisible
 		}
 
@@ -550,7 +431,7 @@ PlasmoidItem {
 			appletExpanded: root.expanded
 			displayTime: root.notificationsBannerTimeout * 1000
 			panelLocation: root.panelLocation
-			provider: root.notificationsProvider
+			provider: providers.notifications.provider
 			showPopups: root.notificationsShowPopups
 		}
 
@@ -560,16 +441,13 @@ PlasmoidItem {
 		}
 	}
 
-
-
-
 	fullRepresentation: Panel {
 		hasMedia: root.hasMedia
 		hasNotifications: root.hasNotifications
 		appletExpanded: root.expanded
-		mediaControlsEnabled: root.mediaState === 1
-		mediaProvider: root.mediaProvider
-		notificationsProvider: root.notificationsProvider
+		mediaControlsEnabled: providers.media.available
+		mediaProvider: providers.media.provider
+		notificationsProvider: providers.notifications.provider
 		notificationsShowClearAll: root.notificationsShowClearAll
 		notificationsShowDoNotDisturb: root.notificationsShowDoNotDisturb
 		requestedDate: root.requestedDate

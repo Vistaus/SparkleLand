@@ -76,7 +76,7 @@ PlasmaCore.ToolTipArea {
             const id = root.pending[0];
             root.pending = root.pending.slice(1);
 
-            const banner = root.provider.bannerForId(id);
+            const banner = root.provider.bannerDataForId(id);
             if (banner === null) {
                 continue;
             }
@@ -103,7 +103,7 @@ PlasmaCore.ToolTipArea {
         if (root.currentId < 0 || root.provider === null) {
             return;
         }
-        if (root.provider.bannerForId(root.currentId) === null) {
+        if (root.provider.bannerDataForId(root.currentId) === null) {
             root.dismiss();
         }
     }
@@ -125,7 +125,7 @@ PlasmaCore.ToolTipArea {
     function closeCurrent() {
         const id = root.currentId;
         if (id >= 0 && root.provider !== null) {
-            root.provider.closeById(id);
+            root.provider.closeNotificationById(id);
         }
 
         root.currentId = -1;
@@ -140,7 +140,7 @@ PlasmaCore.ToolTipArea {
             return;
         }
 
-        root.provider.triggerById(id);
+        root.provider.triggerNotificationById(id);
         root.currentId = -1;
         root.hideImmediately();
     }

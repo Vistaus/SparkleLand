@@ -3,8 +3,6 @@ import QtQuick
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 
-
-
 // Simple month calendar with month switching and date selection
 // 简单月历，支持切换月份和日期选择
 Item {
@@ -137,8 +135,6 @@ Item {
 
     implicitHeight: mainColumn.implicitHeight
     implicitWidth: Math.round(root.theme.gridUnit * 15)
-
-
 
     ColumnLayout {
         id: mainColumn
